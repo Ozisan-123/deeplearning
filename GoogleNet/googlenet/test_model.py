@@ -2,7 +2,7 @@ import torch
 import torch.utils.data as Data
 from torchvision import transforms
 from torchvision.datasets import FashionMNIST
-from model import GoogleNet
+from model import GoogleNet,Inception
 
 
 import torch.utils.data as Data
@@ -93,7 +93,7 @@ def answer_test(model,test_dataLoader):
 
 if __name__ == "__main__":
 
-    model = GoogleNet()
+    model = GoogleNet(Inception)
     model.load_state_dict(torch.load('best_model.pth'))
 
     test_dataloader = test_data_process()
