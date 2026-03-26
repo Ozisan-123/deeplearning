@@ -76,9 +76,9 @@ def train_model_process(model,train_dataloader,val_dataloader,num_epochs):
 
             optimizer.zero_grad()
 
-            loss.backward() #怎么实现的
+            loss.backward() 
 
-            optimizer.step() #为什么先反向传播再梯度下降
+            optimizer.step() 
 
             train_loss += loss.item() * b_x.size(0)
 
