@@ -16,10 +16,16 @@ def to_rgb(img):
 
 def train_val_data_process():
     transform = transforms.Compose([
-        transforms.Lambda(to_rgb),   
-        transforms.Resize((224, 224)),
-        transforms.ToTensor()
-    ])
+    transforms.Lambda(to_rgb),
+    transforms.Resize((256, 256)),
+    transforms.RandomCrop(224),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    )
+])
 
     dataset = datasets.Caltech256(
         root='./data',
@@ -34,33 +40,31 @@ def train_val_data_process():
 
     train_loader = DataLoader(
         dataset=train_data,
-        batch_size=16,
+        batch_size=32,
         shuffle=True,
-        num_workers=2
+        num_workers=2,
+        pin_memory=True
     )
 
     val_loader = DataLoader(
         dataset=val_data,
-        batch_size=16,
+        batch_size=32,
         shuffle=False,
-        num_workers=2
+        num_workers=2,
+        pin_memory=True
     )
 
     return train_loader, val_loader
 
-import torch
-from torch import nn
-import copy
-import time
-import pandas as pd
 
 def train_model_process(model, train_dataloader, val_dataloader, num_epochs):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     optimizer = torch.optim.Adam(model.parameters(), lr=3e-4)
 
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
-
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=num_epochs
+        )
     criterion = nn.CrossEntropyLoss()
     model = model.to(device)
 
